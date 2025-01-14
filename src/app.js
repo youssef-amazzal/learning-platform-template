@@ -1,6 +1,5 @@
 // Question: Comment organiser le point d'entrée de l'application ?
 // Question: Quelle est la meilleure façon de gérer le démarrage de l'application ?
-
 const express = require('express');
 const config = require('./config/env');
 const db = require('./config/db');
@@ -13,6 +12,9 @@ const app = express();
 async function startServer() {
   try {
     // TODO: Initialiser les connexions aux bases de données
+    await db.connectMongo();
+    await db.connectRedis();
+
     // TODO: Configurer les middlewares Express
     // TODO: Monter les routes
     // TODO: Démarrer le serveur
@@ -25,6 +27,9 @@ async function startServer() {
 // Gestion propre de l'arrêt
 process.on('SIGTERM', async () => {
   // TODO: Implémenter la fermeture propre des connexions
+  if (db.getMongoClient()) await db.getMongoClient().close();
+  if (db.getRedisClient()) await db.getRedisClient().quit();
+  process.exit(0);
 });
 
 startServer();
