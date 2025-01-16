@@ -43,7 +43,16 @@ async function getCourseById(req, res) {
 
 async function getAllCourses(req, res) {
   try {
+    const cacheKey = 'all_courses';
+    const cachedCourses = await redisService.getCachedData(cacheKey);
+
+    if (cachedCourses) {
+      return res.status(200).json(cachedCourses);
+    }
+
     const courses = await (await db.getDb()).collection('courses').find().toArray();
+    await redisService.cacheData(cacheKey, courses, 3600); // Cache for 1 hour
+
     res.status(200).json(courses);
   } catch (error) {
     console.error('Failed to get courses:', error);

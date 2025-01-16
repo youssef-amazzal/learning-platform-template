@@ -23,4 +23,7 @@ async function deleteCachedData(key) {
 
 module.exports = {
   // TODO: Exporter les fonctions utilitaires
+  cacheData,
+  getCachedData,
+  deleteCachedData
 };
