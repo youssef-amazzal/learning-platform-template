@@ -1,44 +1,41 @@
-// Question : Pourquoi créer un module séparé pour les connexions aux bases de données ?
-// Réponse : 
-// Question : Comment gérer proprement la fermeture des connexions ?
-// Réponse : 
-
 const { MongoClient } = require('mongodb');
 const redis = require('redis');
-const config = require('./env');
+require('dotenv').config();
 
-let mongoClient, redisClient, db;
+let mongoClient;
+let db;
+let redisClient;
 
 async function connectMongo() {
-  // TODO: Implémenter la connexion MongoDB
-  // Gérer les erreurs et les retries
-  try {
-    mongoClient = new MongoClient(config.mongodb.uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await mongoClient.connect();
-    db = mongoClient.db(config.mongodb.dbName);
-    console.log('Connected to MongoDB');
-  } catch (error) {
-    console.error('Failed to connect to MongoDB:', error);
-    throw error;
+  if (!mongoClient) {
+    try {
+      mongoClient = new MongoClient(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+      await mongoClient.connect();
+      db = mongoClient.db(process.env.MONGODB_DB_NAME);
+      console.log('Connected to MongoDB');
+    } catch (error) {
+      console.error('Failed to connect to MongoDB:', error);
+      throw error;
+    }
   }
+  return db;
 }
 
 async function connectRedis() {
-  // TODO: Implémenter la connexion Redis
-  // Gérer les erreurs et les retries
-  try {
-    redisClient = redis.createClient({ url: config.redis.uri });
-    await redisClient.connect();
-    console.log('Connected to Redis');
-  } catch (error) {
-    console.error('Failed to connect to Redis:', error);
-    throw error;
+  if (!redisClient) {
+    try {
+      redisClient = redis.createClient({ url: process.env.REDIS_URI });
+      await redisClient.connect();
+      console.log('Connected to Redis');
+    } catch (error) {
+      console.error('Failed to connect to Redis:', error);
+      throw error;
+    }
   }
+  return redisClient;
 }
 
-// Export des fonctions et clients
 module.exports = {
-  // TODO: Exporter les clients et fonctions utiles
   connectMongo,
   connectRedis,
   getMongoClient: () => mongoClient,
