@@ -18,6 +18,14 @@ async function startServer() {
     // TODO: Configurer les middlewares Express
     // TODO: Monter les routes
     // TODO: Démarrer le serveur
+    app.use(express.json());
+
+    app.use('/courses', courseRoutes);
+    app.use('/students', studentRoutes);
+
+    app.listen(config.port, () => {
+      console.log(`Express Server is running on port ${config.port}`);
+    });
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
